@@ -1,0 +1,60 @@
+function getAccessToken() {
+  const TOKEN_URL = "https://playful-shark-vl87dr-dev-ed.my.salesforce.com/services/oauth2/token";
+  const CLIENT_ID = '3MVG95mg0lk4batie6BmPLtF4As6o3W_GJ1.tZMKYc6DKiw5uwJ30w1O5FJ4DQMFcIWZPMJNzC3JQc439ahzz';
+  const CLIENT_SECRET = 'F466D861E66DB257070D1E47B38C8F26C0B38815BE96FDB31C3283912E5339B8';
+  const USERNAME = 'saurav.y.kumar@playful-shark-vl87dr.com';
+  const PASSWORD = 'JinMori@001';
+  const SECURITY_TOKEN = 'UnV6TjQ7IiJyvwNaL1sQeVYq';
+
+  var payload = {
+    'grant_type':'password',
+    'client_id': CLIENT_ID,
+    'client_secret': CLIENT_SECRET,
+    'username': USERNAME,
+    'password': PASSWORD+SECURITY_TOKEN
+  };
+  console.log(payload);
+  var options = {
+    'method':'post',
+    'payload':payload
+  };
+  var response = UrlFetchApp.fetch(TOKEN_URL,options);
+  var responseString = response.getContentText();
+  console.log(responseString);
+  var JSONResponse = JSON.parse(responseString);
+  console.log(JSONResponse);
+  const accessToken = JSONResponse.access_token;
+  console.log('accessToken===>>>'+accessToken);
+
+  const GET_ACCOUNT_URL = 'https://playful-shark-vl87dr-dev-ed.my.salesforce.com/services/data/v42.0/query/?q=SELECT+Name,Type+FROM+Account';
+  var header = {
+    "Authorization": 'Bearer ' + accessToken,
+    "Content-Type": "application/json"
+  };
+  var options = {
+    'method' : 'get',
+    'headers': header
+  };
+  var response = UrlFetchApp.fetch(GET_ACCOUNT_URL,options);
+  var responseString = response.getContentText();
+  var JSONResponse = JSON.parse(responseString);
+  console.log(JSONResponse);
+
+  const CREATE_ACCOUNT_URL = 'https://playful-shark-vl87dr-dev-ed.my.salesforce.com/services/data/v55.0/sobjects/Account';
+  var header = {
+    "Authorization": 'Bearer ' + accessToken,
+    "Content-Type": "application/json"
+  };
+  var body = {
+    "Name": "Captain Bly’s Finest Treasure Chests",
+    "ShippingCity": "Lisbon"
+  }
+  var options = {
+    'method' : 'post',
+    'headers': header,
+    'payload' : JSON.stringify(body)
+  };
+  var response = UrlFetchApp.fetch(CREATE_ACCOUNT_URL,options);
+  var responseString = response.getContentText();
+  console.log(responseString);
+}
